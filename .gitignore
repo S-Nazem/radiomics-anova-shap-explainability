@@ -10,3 +10,5 @@ Reading List/
 venv/
 
 data/Extension
+
+*.pptx
