@@ -1,4 +1,4 @@
-T = readtable('All_features_uncorrected_with_metadata.csv');
+T = readtable('All_features_uncorrected_dropped246_with_metadata.csv');
 allGL = unique(T.GLbins);
 featureCols = setdiff(T.Properties.VariableNames, {'PatientName','Model','GLbins','Wavelength','Reconstruction'});
 numFeatures = numel(featureCols);

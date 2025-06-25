@@ -1,7 +1,7 @@
 % main.m — Full Factorial ANOVA η² Plot
 
 % Step 1: Load data
-T = readtable('All_features_uncorrected_with_metadata.csv');  % <- Replace with your actual file name
+T = readtable('All_features_uncorrected_dropped246_with_metadata.csv');  % <- Replace with your actual file name
 
 % Step 2: Identify relevant columns
 factorNames = {'Model', 'GLbins', 'Wavelength', 'Reconstruction'};

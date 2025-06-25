@@ -14,6 +14,8 @@ sn665/
 │
 ├── data/                   # CSV data files used for analysis (radiomics, metadata, etc.)
 │   └── Extension/          # DICOM image files for the LIDC-IDRI extension dataset
+├── Finalised Notebooks/    # Final Jupyter notebooks for analysis
+│   └── ANOVA.ipynb         # Notebook for the sensitivity analysis section
 │
 ├── MATLAB CODE (ANOVA)/    # MATLAB scripts for full factorial ANOVA sensitivity analysis
 │

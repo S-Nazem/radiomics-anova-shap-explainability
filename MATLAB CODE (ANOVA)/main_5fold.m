@@ -1,7 +1,7 @@
 % main5fold.m — Stratified 5-fold η² for Skewness with balanced PDX exclusion
 
 % Load data
-T = readtable('All_features_uncorrected_all_tumours_with_metadata.csv');
+T = readtable('All_features_uncorrected_dropped246_with_metadata.csv');
 feature = 'original_firstorder_Kurtosis';
 factors = {'Model','GLbins','Wavelength','Reconstruction'};
 numFolds = 5;
