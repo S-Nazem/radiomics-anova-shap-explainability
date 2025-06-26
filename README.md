@@ -1,9 +1,9 @@
 # Radiomic Feature Sensitivity and Classification in Photoacoustic Imaging and CT (MPhil Project)
 
-This repository contains the full code and data processing pipeline used for my MPhil project, structured into two main sections:
+This repository contains the complete code, data pipeline, and analysis for my MPhil project on radiomic feature robustness and classification across two imaging modalities:
 
-- **Section A:** Reproduction of Escudero Sanchez et al. (2022) — Full factorial ANOVA sensitivity analysis, feature selection, and classification on photoacoustic radiomics.
-- **Section B:** Extension study applying the same radiomic pipeline to the LIDC-IDRI lung CT dataset.
+- **Section A:** Reproduction of Escudero Sánchez et al. (2022) using full factorial ANOVA, feature selection, machine learning, and SHAP interpretability on photoacoustic imaging of breast cancer PDXs.
+- **Section B:** Extension study applying the same radiomics pipeline to the LIDC-IDRI CT dataset for lung nodule classification.
 
 ---
 
@@ -12,23 +12,37 @@ This repository contains the full code and data processing pipeline used for my 
 ```bash
 sn665/
 │
-├── data/                   # CSV data files used for analysis (radiomics, metadata, etc.)
-│   └── Extension/          # DICOM image files for the LIDC-IDRI extension dataset
-├── Finalised Notebooks/    # Final Jupyter notebooks for analysis
-│   └── ANOVA.ipynb         # Notebook for the sensitivity analysis section
+├── data/                         # Radiomic CSVs and metadata
+│   ├── LIDC_Extension/           # Includes DICOM + XMLs from LIDC-IRDI plus csvs
+│   ├── Photoacoustic_Study/      # PAI radiomics and metadata csvs
+│   └── ModelsUncorrected/        # Radiomic Features (PAI Study) uncorrected
 │
-├── MATLAB CODE (ANOVA)/    # MATLAB scripts for full factorial ANOVA sensitivity analysis
+├── Finalised Notebooks/         # Final cleaned Jupyter notebooks
+│   ├── ANOVA.ipynb              # Section A: ANOVA Sensitivity analysis
+│   ├── MODEL_PERFORMANCE.ipynb  # Section A: MOdel Discrimination: ML + SHAP
+│   ├── EXTENSION.ipynb          # Section B: LIDC-IRDI Extension
+│   └── volume_results.pkl       # Precomputed results for SHAP rank plots
 │
-├── plots/                  # Figures and plots generated for Section A
-├── plots_extension/        # Figures and plots generated for Section B (LIDC extension)
+├── Development Notebooks/       # Early exploratory development notebooks (included for interest)
+├── MATLAB scripts (ANOVA)/      # MATLAB code for ANOVA calculations
 │
-├── Dev_notebook.ipynb      # Section A: Full ANOVA sensitivity analysis (photoacoustic)
-├── Dev_notebook_2.ipynb    # Section A: IQR plots for feature variability
-├── Dev_notebook_3.ipynb    # Section A: Feature selection, ML models, SHAP analysis
-├── Dev_notebook_4.ipynb    # Section B: LIDC extension (full pipeline: preprocessing, radiomics, ML, SHAP)
+├── src/                         # Custom scripts (clustering, SHAP, plots, etc.)
+├── plots/                       # Figures from Section A (PAI)
+│   ├── ANOVA_plots/
+│   ├── Distributions_plots/
+│   ├── SHAP_plots/
+│   └── misc/
 │
-├── figs.pptx               # Exported figures for inclusion in final report
-└── Instructions.md         # Internal notes and steps for reproduction
+├── plots_extension/             # Figures from Section B (LIDC)
+│   ├── feature_selection_plots/
+│   ├── ML_plots/
+│   ├── shap_plots/
+│   └── misc/
+│
+├── Instructions.md              # Internal dev instructions
+├── requirements.txt             # Environment dependencies
+└── README.md                    # This file
+
 ```
 
 --
@@ -36,7 +50,9 @@ sn665/
 
 ## Environment Setup
 
-You can recreate the environment using Python 3.9+ and the following packages:
+Recommended: Python 3.9+
+
+Install required packages using:
 
 ```bash
 pip install -r requirements.txt
@@ -51,7 +67,7 @@ Main dependencies include:
 --
 
 
-## How to Reproduce
+## Reproducibility Instructions
 
 Section A — Photoacoustic (Escudero Sanchez reproduction)
 - Run: Dev_notebook.ipynb → ANOVA sensitivity analysis
@@ -63,12 +79,27 @@ Section B — LIDC Extension (CT dataset)
 - Run: Dev_notebook_4.ipynb → Full pipeline for lung CT extension
 
 
-
 --
 
 ## Notes
 
-- DICOM files are stored under data/Extension/ and are required for radiomic extraction.
-- Full factorial ANOVA is computed using MATLAB (see MATLAB CODE (ANOVA)/).
-- All final radiomics CSVs and ML-ready datasets are available under data/ for reproducibility.
+- The MATLAB scripts compute full-factorial ANOVA statistics (η²) and were used for reproduction consistency.
+- DICOM files used for LIDC radiomics are referenced in data/LIDC_Extension/, but not pushed due to size.
+- SHAP stability was assessed using 1000 seeds with saved output (volume_results.pkl).
+- To generate new results from scratch (using a new random seed), uncomment the three "to_csv" lines scattered throughout EXTENSION.ipynb. This will regenerate:
+    - 3D volume reconstructions
+    - Radiomic feature extraction
+    - Feature selection and ML classification
+    - SHAP interpretation
+    - Slight variation in outputs is expected due to randomness in SMOTE and model training.
+
+
+--
+
+
+## Use of Generative Tools 
+
+- I used Github's Copilot to help me automatically finish off some code blocks and also to quickly docstring my functions.
+
+- I used LLMs (ChatGPT) to help me create professional looking plots and occasionally to help me debug errors when i implemented something incorrectly.
 
