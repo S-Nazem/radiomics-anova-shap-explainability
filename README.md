@@ -13,35 +13,45 @@ This repository contains the complete code, data pipeline, and analysis for my M
 sn665/
 │
 ├── data/                         # Radiomic CSVs and metadata
-│   ├── LIDC_Extension/           # Includes DICOM + XMLs from LIDC-IRDI plus csvs
+│   ├── LIDC_Extension/           # Includes DICOM + XMLs from LIDC-IDRI plus csvs
 │   ├── Photoacoustic_Study/      # PAI radiomics and metadata csvs
 │   └── ModelsUncorrected/        # Radiomic Features (PAI Study) uncorrected
 │
-├── Finalised Notebooks/         # Final cleaned Jupyter notebooks
-│   ├── ANOVA.ipynb              # Section A: ANOVA Sensitivity analysis
-│   ├── MODEL_PERFORMANCE.ipynb  # Section A: MOdel Discrimination: ML + SHAP
-│   ├── EXTENSION.ipynb          # Section B: LIDC-IRDI Extension
-│   └── volume_results.pkl       # Precomputed results for SHAP rank plots
+├── Finalised Notebooks/          # Final cleaned Jupyter notebooks
+│   ├── ANOVA.ipynb               # Section A: ANOVA Sensitivity analysis
+│   ├── MODEL_PERFORMANCE.ipynb   # Section A: Model Discrimination (ML + SHAP)
+│   ├── EXTENSION.ipynb           # Section B: LIDC-IDRI Extension
+│   └── params.yaml               # YAML config used in SHAP rank reproducibility
 │
-├── Development Notebooks/       # Early exploratory development notebooks (included for interest)
-├── MATLAB scripts (ANOVA)/      # MATLAB code for ANOVA calculations
+├── Development Notebooks/        # Early exploratory notebooks (included for reference)
 │
-├── src/                         # Custom scripts (clustering, SHAP, plots, etc.)
-├── plots/                       # Figures from Section A (PAI)
+├── MATLAB scripts (ANOVA)/       # MATLAB scripts used for full factorial ANOVA
+│
+├── src/                          # Custom Python modules (importable functions)
+│   ├── Extension.py              # Add code used for the LIDC-IRDI extension
+│   ├── feature_selection.py      # Feature selection utilities
+│   ├── ML.py                     # ML training
+│   ├── PAI.py                    # SHAP, ML, and ANOVA utils for Section A (PAI)
+│   └── plotting.py               # Plotting functions for section A
+│
+├── plots/                        # Figures from Section A (PAI)
 │   ├── ANOVA_plots/
 │   ├── Distributions_plots/
 │   ├── SHAP_plots/
 │   └── misc/
 │
-├── plots_extension/             # Figures from Section B (LIDC)
+├── plots_extension/              # Figures from Section B (LIDC-IDRI extension)
 │   ├── feature_selection_plots/
 │   ├── ML_plots/
 │   ├── shap_plots/
 │   └── misc/
 │
-├── Instructions.md              # Internal dev instructions
-├── requirements.txt             # Environment dependencies
-└── README.md                    # This file
+├── Instructions.md               # Internal usage instructions
+├── requirements.txt              # Python environment dependencies
+├── README.md                     # This file
+└── .gitignore                    # Files and folders to ignore in Git
+
+
 
 ```
 
@@ -78,7 +88,6 @@ Section A — Photoacoustic (Escudero Sanchez reproduction)
 Section B — LIDC Extension (CT dataset)
 - Run: Dev_notebook_4.ipynb → Full pipeline for lung CT extension
 
-
 --
 
 ## Notes
@@ -93,7 +102,6 @@ Section B — LIDC Extension (CT dataset)
     - SHAP interpretation
     - Slight variation in outputs is expected due to randomness in SMOTE and model training.
 
-
 --
 
 
@@ -102,4 +110,3 @@ Section B — LIDC Extension (CT dataset)
 - I used Github's Copilot to help me automatically finish off some code blocks and also to quickly docstring my functions.
 
 - I used LLMs (ChatGPT) to help me create professional looking plots and occasionally to help me debug errors when i implemented something incorrectly.
-
