@@ -18,8 +18,16 @@ from statsmodels.stats.multitest import multipletests
 import pingouin as pg
 from sklearn.feature_selection import RFECV
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import StratifiedKFold
 from boruta import BorutaPy
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.metrics import classification_report, roc_auc_score
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+import shap
+from matplotlib_venn import venn2
+import seaborn as sns
 
 
 def assign_tumour_ids_by_overlap(df_good, image_shape=(512, 512)):
@@ -456,7 +464,7 @@ def run_rfecv(X, y, output_path=None):
     return selected_features
 
 
-def run_boruta(X, y, alpha=0.01, verbose=2, max_iter=100):
+def run_boruta(X, y, alpha=0.05, verbose=2, max_iter=100):
     rf = RandomForestClassifier(
         n_estimators=500,
         random_state=42,
@@ -471,13 +479,418 @@ def run_boruta(X, y, alpha=0.01, verbose=2, max_iter=100):
         verbose=verbose,
         random_state=42,
         max_iter=max_iter,
-        alpha=alpha
+        alpha=alpha,
+        perc=50
     )
 
     selector.fit(X.values, y.values)
 
-    support_combined = selector.support_ | selector.support_weak_
-    selected = X.columns[support_combined].tolist()
+    selected = X.columns[selector.support_].tolist()
 
-    print("✅ Selected features using Boruta (confirmed + tentative):", selected)
+    print("✅ Selected features using Boruta:", selected)
     return selected
+
+
+def train_test_with_smote(X, y, test_size=0.2, random_state=42):
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, stratify=y, random_state=random_state
+    )
+
+    smote = SMOTE(random_state=random_state)
+    X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+
+    return X_train, X_test, y_train, y_test, X_train_resampled, y_train_resampled
+
+def evaluate_pipeline(X_train, y_train, X_test, y_test, classifier=None, report_name=None):
+    if classifier is None:
+        classifier = RandomForestClassifier(
+            n_estimators=100,
+            max_depth=20,
+            class_weight="balanced",
+            random_state=42,
+            n_jobs=-1
+        )
+
+    pipeline = Pipeline([
+        ("scale", StandardScaler()),
+        ("clf", classifier)
+    ])
+
+    pipeline.fit(X_train, y_train)
+    y_pred = pipeline.predict(X_test)
+    y_proba = pipeline.predict_proba(X_test)[:, 1]
+
+    auc_score = roc_auc_score(y_test, y_proba)
+    clf_report = classification_report(y_test, y_pred, digits=3)
+    clf_dict = classification_report(y_test, y_pred, output_dict=True)
+
+    print(f"📊 {report_name or 'Model'} AUC:", auc_score)
+    print(clf_report)
+
+    return clf_dict
+
+def cross_val_auc(X, y, classifier=None):
+    if classifier is None:
+        classifier = RandomForestClassifier(
+            n_estimators=100,
+            max_depth=20,
+            class_weight="balanced",
+            random_state=42,
+            n_jobs=-1
+        )
+
+    pipeline = Pipeline([
+        ("scale", StandardScaler()),
+        ("clf", classifier)
+    ])
+
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    scores = cross_val_score(pipeline, X, y, cv=cv, scoring="roc_auc")
+    print("Cross-validated AUCs:", scores)
+    print("Mean AUC:", scores.mean())
+    return scores
+
+
+
+from xgboost import XGBClassifier
+from sklearn.linear_model import LogisticRegression
+
+
+def fit_and_evaluate_model(X_train, y_train, X_test, y_test, model, label="Model"):
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    y_proba = model.predict_proba(X_test)[:, 1]
+
+    auc = roc_auc_score(y_test, y_proba)
+    report = classification_report(y_test, y_pred, digits=3, output_dict=True)
+
+    print(f"📊 {label} AUC:", auc)
+    print(classification_report(y_test, y_pred, digits=3))
+
+    return report
+
+
+def build_rf_pipeline():
+    return Pipeline([
+        ("scale", StandardScaler()),
+        ("clf", RandomForestClassifier(
+            n_estimators=100,
+            max_depth=20,
+            class_weight="balanced",
+            random_state=42,
+            n_jobs=-1
+        ))
+    ])
+
+
+def build_xgb_model():
+    return XGBClassifier(
+        objective="binary:logistic",
+        eval_metric="auc",
+        use_label_encoder=False,
+        random_state=42,
+        n_jobs=-1,
+        n_estimators=300,
+        max_depth=4,
+        learning_rate=0.1
+    )
+
+def build_logreg_pipeline():
+    return Pipeline([
+        ("scale", StandardScaler()),
+        ("clf", LogisticRegression(
+            class_weight="balanced",
+            max_iter=1000,
+            random_state=42
+        ))
+    ])
+
+from sklearn.svm import SVC
+
+def build_svm_pipeline():
+    return Pipeline([
+        ("scale", StandardScaler()),
+        ("clf", SVC(
+            probability=True,
+            class_weight="balanced",
+            random_state=42
+        ))
+    ])
+
+
+
+def plot_bootstrap_metrics_bars(
+    bar_sets: list,
+    metrics: list,
+    labels: list,
+    colors: list,
+    title: str,
+    ax=None,
+    legend=True,
+    save_path=None,
+    dpi=300
+):
+    """
+    Plot grouped bar chart with error bars and SMOTE vs No-SMOTE background shading.
+
+    Parameters
+    ----------
+    bar_sets : list of (means, errors)
+        Each element is a tuple of metric means and corresponding CI/error bars.
+    metrics : list of str
+        Metric names for x-axis (e.g. ["Accuracy", "Recall (Class 0)", ...])
+    labels : list of str
+        Labels for each bar (must match length of bar_sets)
+    colors : list of str
+        Color for each bar
+    title : str
+        Title of the plot (shown above or optionally removed)
+    ax : matplotlib.axes.Axes or None
+        If provided, plots on this axis. If None, creates a new figure.
+    legend : bool
+        Whether to include a legend.
+    save_path : str or None
+        If set, saves the figure to this path.
+    dpi : int
+        Dots-per-inch for saving.
+    """
+    x = np.arange(len(metrics))
+    width = 0.10
+    group_width = width * len(bar_sets)
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(14, 6))
+
+    # === Background shading for SMOTE vs No SMOTE ===
+    for xi in x:
+        left = xi - group_width / 2
+        ax.axvspan(left, left + 4*width, color="lightgrey", alpha=0.7, zorder=0)
+        ax.axvspan(left + 4*width, left + 8*width, color="lightblue", alpha=0.7, zorder=0)
+
+    # === Plot bars ===
+    for i, ((means, errors), color, label) in enumerate(zip(bar_sets, colors, labels)):
+        offset = (i - (len(bar_sets)-1)/2) * width
+        ax.bar(
+            x + offset, means,
+            width=width,
+            yerr=errors,
+            capsize=6,
+            linewidth=1,
+            edgecolor="black",
+            color=color,
+            label=label
+        )
+
+    # === Formatting ===
+    ax.set_xticks(x)
+    ax.set_xticklabels(metrics, fontsize=14)
+    ax.set_ylabel("Score", fontsize=14)
+    ax.set_ylim(0, 1.0)
+    ax.set_title(title, fontsize=16)
+    ax.grid(axis="y", linestyle="--", alpha=0.6)
+    ax.tick_params(axis="y", labelsize=12)
+
+    if legend:
+        ax.legend(ncol=4, fontsize=13, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.23))
+
+    if save_path:
+        plt.tight_layout()
+        plt.savefig(save_path, dpi=dpi)
+
+    if ax is None:
+        plt.show()
+
+
+
+
+def plot_shap_summary_and_bar(X_train, y_train, save_prefix, get_friendly_feature_names):
+    """
+    Compute SHAP values and plot beeswarm and bar plots with friendly feature names.
+
+    Parameters:
+        X_train (pd.DataFrame): Feature matrix.
+        y_train (pd.Series): Target vector.
+        save_prefix (str): Filename prefix for saving plots.
+        get_friendly_feature_names (callable): Maps column names to friendly names.
+    """
+
+    pipeline = Pipeline([
+        ("scale", StandardScaler()),
+        ("clf", RandomForestClassifier(
+            n_estimators=100,
+            max_depth=20,
+            class_weight="balanced",
+            random_state=42,
+            n_jobs=-1
+        ))
+    ])
+
+    pipeline.fit(X_train, y_train)
+    rf = pipeline.named_steps["clf"]
+    scaler = pipeline.named_steps["scale"]
+    X_scaled = scaler.transform(X_train)
+
+    # SHAP explanation
+    explainer = shap.TreeExplainer(rf)
+    shap_vals = explainer.shap_values(X_scaled)
+    shap_vals_class1 = shap_vals[:, :, 1]
+
+    # Friendly names
+    friendly_names = get_friendly_feature_names(X_train.columns)
+
+    # Beeswarm plot
+    shap.summary_plot(
+        shap_vals_class1,
+        X_scaled,
+        feature_names=friendly_names,
+        plot_size=(18, 8),
+        max_display=10,
+        show=False
+    )
+    plt.xlabel("SHAP value (impact on model output)", fontsize=18)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=18)
+    plt.tight_layout()
+    plt.grid(False)
+    plt.savefig(f"../plots_extension/shap_plots/shap_beeswarm_{save_prefix}.png", dpi=400)
+    plt.show()
+
+    # Bar plot (mean(|SHAP|))
+    mean_abs_shap = np.abs(shap_vals_class1).mean(axis=0)
+    top_indices = np.argsort(mean_abs_shap)[-10:][::-1]
+    top_features = [friendly_names[i] for i in top_indices]
+    top_values = mean_abs_shap[top_indices]
+
+    plt.figure(figsize=(18, 8), dpi=400)
+    plt.barh(range(len(top_features)), top_values, color="#d62728")
+    plt.yticks(range(len(top_features)), top_features, fontsize=18)
+    plt.xticks(fontsize=16)
+    plt.xlabel("mean(|SHAP value|)", fontsize=18)
+    plt.gca().invert_yaxis()
+    plt.tight_layout()
+    plt.grid(False)
+    plt.savefig(f"../plots_extension/shap_plots/shap_bar_{save_prefix}.png", dpi=400)
+    plt.show()
+
+
+
+
+def plot_feature_selection_venn(rfe_features, boruta_features, save_path):
+
+    rfe_set = set(rfe_features)
+    boruta_set = set(boruta_features)
+
+    plt.figure(figsize=(7, 7))
+    v = venn2([rfe_set, boruta_set], set_labels=("RFE", "Boruta"), set_colors=("#56B4E9", "#009E73"), alpha=0.6)
+
+    for text in v.set_labels:
+        text.set_fontsize(14)
+        text.set_fontweight("bold")
+
+    for text in v.subset_labels:
+        if text:
+            text.set_fontsize(16)
+
+    for patch in v.patches:
+        if patch:
+            patch.set_edgecolor("black")
+            patch.set_linewidth(1.2)
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=400)
+    plt.show()
+
+
+
+def compute_shap_rank_stability(X, y, friendly_names, n_seeds=1000, top_k=10):
+
+    rank_dict = {}
+    for seed in range(n_seeds):
+        pipe = Pipeline([
+            ("scale", StandardScaler()),
+            ("clf", RandomForestClassifier(
+                n_estimators=100,
+                max_depth=20,
+                class_weight="balanced",
+                random_state=seed,
+                n_jobs=-1
+            ))
+        ])
+        pipe.fit(X, y)
+        rf = pipe.named_steps["clf"]
+        scaler = pipe.named_steps["scale"]
+        X_scaled = scaler.transform(X)
+
+        explainer = shap.TreeExplainer(rf)
+        shap_vals = explainer.shap_values(X_scaled)
+        shap_vals_class1 = shap_vals[:, :, 1]
+
+        mean_abs_shap = np.abs(shap_vals_class1).mean(axis=0)
+        ranks = pd.Series((-mean_abs_shap).argsort().argsort() + 1, index=X.columns)
+        rank_dict[f"seed_{seed}"] = ranks
+
+    shap_ranks = pd.concat(rank_dict.values(), axis=1)
+    shap_ranks.columns = rank_dict.keys()
+
+    friendly_names_dict = dict(zip(X.columns, friendly_names))
+    shap_ranks_named = shap_ranks.rename(index=friendly_names_dict)
+
+    top_features = shap_ranks_named.mean(axis=1).nsmallest(top_k).index
+    shap_ranks_top10 = shap_ranks_named.loc[top_features[::-1]]
+
+    return shap_ranks_top10
+
+
+
+def plot_shap_rank_stability(shap_ranks_top10, save_path, xlim=(0, 25)):
+
+    df_plot = shap_ranks_top10.T.melt(var_name="Feature", value_name="Rank")
+
+    plt.figure(figsize=(12, 5.5))
+    sns.set(style="whitegrid", font_scale=1.3)
+
+    boxprops = dict(linewidth=1.5)
+    medianprops = dict(linewidth=2, color='black')
+    whiskerprops = dict(linewidth=1.5)
+    capprops = dict(linewidth=1.5)
+    palette = sns.color_palette("Set3", n_colors=len(shap_ranks_top10))
+
+    sns.boxplot(
+        data=df_plot,
+        x="Rank", y="Feature",
+        palette=palette,
+        linewidth=1.5,
+        boxprops=boxprops,
+        medianprops=medianprops,
+        whiskerprops=whiskerprops,
+        capprops=capprops
+    )
+
+    plt.xlabel("SHAP Rank", fontsize=16)
+    plt.ylabel("Feature", fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.xlim(*xlim)
+
+    sns.despine(left=True, bottom=True)
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=400)
+    plt.show()
+
+
+
+def print_metric_table(selectors, sampling, models, metrics, model_names):
+    for selector in selectors:
+        print(f"\n==================== {selector.upper()} RESULTS ====================\n")
+        for sample in sampling:
+            print(f"--- With {sample.upper()} ---\n")
+            for model in models:
+                key_means = f"means_{model}_{selector}_{sample}"
+                key_ci = f"ci_{model}_{selector}_{sample}"
+                means = globals()[key_means]
+                ci = globals()[key_ci]
+
+                print(f"{model_names[model]}:")
+                for metric, mean, err in zip(metrics, means, ci):
+                    print(f"  {metric:15}: {mean:.3f} ± {err:.3f}")
+                print("")
