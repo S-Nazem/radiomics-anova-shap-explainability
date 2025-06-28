@@ -7,6 +7,46 @@ This repository contains the complete code, data pipeline, and analysis for my M
 
 ---
 
+
+## Key Results
+
+**Section A:** PAI Radiomics Study
+
+1. Sensitivity Analysis (ANOVA)
+
+Full-factorial ANOVA revealed key radiomic features sensitive to the model type and not to confounding factors (ie: FO Skewness, FO Kurtosis).
+
+<p align="center"> <img src="plots/ANOVA_plots/ANOVA_full.png" width="600"/> </p>
+
+2. SHAP Analysis
+
+SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), GLCM Imc2, FO Skewness, and FO Variance as the most impactful features for the RF classifier
+
+<p align="center"> <img src="plots/SHAP_plots/shap_beeswarm.png" width="600"/> </p>
+
+
+
+**Section B:** LIDC-IRDI Extension Study
+
+1. Classifier Performance Plot (RFE vs Boruta) for both original and resampled sets
+
+<p align="center"> <img src="plots_extension/ML_plots/combined_rfe_boruta_smote_shaded.png" width="600"/> </p>
+
+2. SHAP Analysis
+
+SHAP analysis identified GLSZM Gray Level Non uniformity and its normalised counterpart as the most impactful features. Very little overlap between the PAI syudy and this, as could be expected.
+
+<p align="center"> <img src="plots_extension/shap_plots/shap_bar_full.png" width="600"/> </p>
+
+3. SHAP Consistency Box plots
+
+SHAP analysis repeated over 1000 independant seeds unanimously showed GLSZM Gray Level Non Unifomity as the most influential feature.
+
+<p align="center"> <img src="plots_extension/shap_plots/shap_rank_stability_horizontal_nosmote.png" width="600"/> </p>
+
+
+--
+
 ## Project Structure
 
 ```bash
@@ -87,45 +127,6 @@ Section A — Photoacoustic (Escudero Sanchez reproduction)
 
 Section B — LIDC Extension (CT dataset)
 - Run: Dev_notebook_4.ipynb → Full pipeline for lung CT extension
-
---
-
-## Key Results
-
-**Section A:** PAI Radiomics Study
-
-1. Sensitivity Analysis (ANOVA)
-
-Full-factorial ANOVA revealed key radiomic features sensitive to the model type and not to confounding factors (ie: FO Skewness, FO Kurtosis).
-
-<p align="center"> <img src="plots/ANOVA_plots/ANOVA_full.png" width="600"/> </p>
-
-2. SHAP Analysis
-
-SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), GLCM Imc2, FO Skewness, and FO Variance as the most impactful features for the RF classifier
-
-<p align="center"> <img src="plots/SHAP_plots/shap_beeswarm.png" width="600"/> </p>
-
-
-
-**Section B:** LIDC-IRDI Extension Study
-
-1. Classifier Performance Plot (RFE vs Boruta) for both original and resampled sets
-
-<p align="center"> <img src="plots_extension/ML_plots/combined_rfe_boruta_smote_shaded.png" width="400"/> </p>
-
-2. SHAP Analysis
-
-SHAP analysis identified GLSZM Gray Level Non uniformity and its normalised counterpart as the most impactful features. Very little overlap between the PAI syudy and this, as could be expected.
-
-<p align="center"> <img src="plots_extension/shap_plots/shap_bar_full.png" width="400"/> </p>
-
-3. SHAP Consistency Box plots
-
-SHAP analysis repeated over 1000 independant seeds unanimously showed GLSZM Gray Level Non Unifomity as the most influential feature.
-
-<p align="center"> <img src="plots_extension/shap_plots/shap_rank_stability_horizontal_nosmote.png" width="400"/> </p>
-
 
 --
 
