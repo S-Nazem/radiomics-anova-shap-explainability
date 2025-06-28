@@ -98,7 +98,7 @@ Section B — LIDC Extension (CT dataset)
 
 Full-factorial ANOVA revealed key radiomic features sensitive to the model type and not to confounding factors (ie: FO Skewness, FO Kurtosis).
 
-<p align="center"> <img src="plots/ANOVA_plots/ANOVA_full.png.png" width="600"/> </p>
+<p align="center"> <img src="plots/ANOVA_plots/ANOVA_full.png" width="600"/> </p>
 
 2. SHAP Analysis
 
@@ -118,13 +118,13 @@ SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), GLCM Imc2, 
 
 SHAP analysis identified GLSZM Gray Level Non uniformity and its normalised counterpart as the most impactful features. Very little overlap between the PAI syudy and this, as could be expected.
 
-<p align="center"> <img src="plots_extension/shap_plots/shap_bar_full.png.png" width="400"/> </p>
+<p align="center"> <img src="plots_extension/shap_plots/shap_bar_full.png" width="400"/> </p>
 
 3. SHAP Consistency Box plots
 
 SHAP analysis repeated over 1000 independant seeds unanimously showed GLSZM Gray Level Non Unifomity as the most influential feature.
 
-<p align="center"> <img src="plots_extension/shap_plots/shap_rank_stability_horizontal_nosmote.png.png.png" width="400"/> </p>
+<p align="center"> <img src="plots_extension/shap_plots/shap_rank_stability_horizontal_nosmote.png" width="400"/> </p>
 
 
 --
