@@ -163,13 +163,11 @@ def get_friendly_feature_names(feature_names):
         'original_glszm_LowGrayLevelZoneEmphasis': 'GLSZM Low GLE Zone Emph.',
         'original_glcm_Autocorrelation': 'GLCM Autocorrelation',
         'original_shape_Maximum3DDiameter': 'Shape Maximum 3D Diameter',
-        'original_glrlm_LongRunLowGrayLevelEmphasis': 'GLRLM Long Run Low GLE'
+        'original_glrlm_LongRunLowGrayLevelEmphasis': 'GLRLM Long Run Low GLE',
     }
 
-    # Fallback: transform raw names to human-readable
     def fallback(name):
         name = name.replace("original_", "")
-        name = name.replace("_", " ")
         name = name.replace("firstorder", "FO")
         name = name.replace("glcm", "GLCM")
         name = name.replace("glszm", "GLSZM")
@@ -177,9 +175,11 @@ def get_friendly_feature_names(feature_names):
         name = name.replace("glrlm", "GLRLM")
         name = name.replace("ngtdm", "NGTDM")
         name = name.replace("shape", "Shape")
-        return name.strip().title()
+        name = name.replace("_", " ")
+        return name.strip()
 
     return [base_mapping.get(f, fallback(f)) for f in feature_names]
+
 
 
 
