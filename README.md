@@ -2,7 +2,7 @@
 
 This repository contains the complete code, data pipeline, and analysis for my MPhil project on radiomic feature robustness and classification across two imaging modalities:
 
-- **Section A:** Reproduction of Escudero Sánchez et al. (2022) using full factorial ANOVA, feature selection, machine learning, and SHAP interpretability on photoacoustic imaging of breast cancer PDXs.
+- **Section A:** Reproduction of Escudero Sánchez et al. using full factorial ANOVA, feature selection, machine learning, and SHAP interpretability on photoacoustic imaging of breast cancer PDXs.
 - **Section B:** Extension study applying the same radiomics pipeline to the LIDC-IDRI CT dataset for lung nodule classification.
 
 ---
@@ -20,10 +20,9 @@ Full-factorial ANOVA revealed key radiomic features sensitive to the model type 
 
 2. SHAP Analysis
 
-SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), GLCM Imc2, FO Skewness, and FO Variance as the most impactful features for the RF classifier
+SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), FO Skewness, FO Variance, and GLCM Imc2 as the most impactful features for the RF classifier
 
 <p align="center"> <img src="plots/SHAP_plots/shap_beeswarm.png" width="600"/> </p>
-
 
 
 **Section B:** LIDC-IRDI Extension Study
@@ -34,7 +33,7 @@ SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), GLCM Imc2, 
 
 2. SHAP Analysis
 
-SHAP analysis identified GLSZM Gray Level Non uniformity and its normalised counterpart as the most impactful features. Very little overlap between the PAI syudy and this, as could be expected.
+SHAP analysis identified GLSZM Gray Level Non uniformity and its normalised counterpart as the most impactful features. Very little overlap between the PAI study and this, as could be expected.
 
 <p align="center"> <img src="plots_extension/shap_plots/shap_bar_full.png" width="600"/> </p>
 
@@ -53,15 +52,13 @@ SHAP analysis repeated over 1000 independant seeds unanimously showed GLSZM Gray
 sn665/
 │
 ├── data/                         # Radiomic CSVs and metadata
-│   ├── LIDC_Extension/           # Includes DICOM + XMLs from LIDC-IDRI plus csvs
-│   ├── Photoacoustic_Study/      # PAI radiomics and metadata csvs
-│   └── ModelsUncorrected/        # Radiomic Features (PAI Study) uncorrected
+│   ├── LIDC_Extension/csv           # Includes DICOM + XMLs from LIDC-IDRI plus csvs
+│   ├── Photoacoustic_Study/csv      # PAI radiomics and metadata csvs
 │
 ├── Finalised Notebooks/          # Final cleaned Jupyter notebooks
 │   ├── ANOVA.ipynb               # Section A: ANOVA Sensitivity analysis
 │   ├── MODEL_PERFORMANCE.ipynb   # Section A: Model Discrimination (ML + SHAP)
 │   ├── EXTENSION.ipynb           # Section B: LIDC-IDRI Extension
-│   └── params.yaml               # YAML config used in SHAP rank reproducibility
 │
 ├── Development Notebooks/        # Early exploratory notebooks (included for reference)
 │
@@ -120,27 +117,25 @@ Main dependencies include:
 ## Reproducibility Instructions
 
 Section A — Photoacoustic (Escudero Sanchez reproduction)
-- Run: Dev_notebook.ipynb → ANOVA sensitivity analysis
-- Run: Dev_notebook_2.ipynb → IQR variability plots
-- Run: Dev_notebook_3.ipynb → Feature selection, ML classification, SHAP explanations
+- ANOVA.ipynb → ANOVA sensitivity analysis
+- MODEL_PERFORMANCE.ipynb → IQR variability plots, feature selection, ML and SHAP
 
 
 Section B — LIDC Extension (CT dataset)
-- Run: Dev_notebook_4.ipynb → Full pipeline for lung CT extension
+- EXTENSION.ipynb → Feature selection (RFE/Boruta), ML classification, SHAP explanations, SHAP boxplots
 
 --
 
 ## Notes
 
-- The MATLAB scripts compute full-factorial ANOVA statistics (η²) and were used for reproduction consistency.
-- DICOM files used for LIDC radiomics are referenced in data/LIDC_Extension/, but not pushed due to size.
-- SHAP stability was assessed using 1000 seeds with saved output (volume_results.pkl).
-- To generate new results from scratch (using a new random seed), uncomment the three "to_csv" lines scattered throughout EXTENSION.ipynb. This will regenerate:
-    - 3D volume reconstructions
-    - Radiomic feature extraction
-    - Feature selection and ML classification
-    - SHAP interpretation
-    - Slight variation in outputs is expected due to randomness in SMOTE and model training.
+- The MATLAB scripts compute full-factorial ANOVA statistics (η²).
+- DICOM files used for LIDC radiomics were referenced in data/LIDC_Extension/, but not pushed due to size.
+- data/Photoacoustic_Study/csv contain all required radiomic CSVs for Part A.
+- data/LIDC_Extension/csv includes the csvs for Part B.
+- data/LIDC_Extension/volume_results.pkl (used in EXTENSION.ipynb) is not pushed due to large size (>2GB).
+- To reproduce the results, run the volume creation block in the notebook.
+- When prompted Compute new volumes? [Y/n], type Y to generate the file.
+- All core functions (radiomic loading, feature selection, ML, SHAP, plotting) are implemented in the src/ folder.
 
 --
 
