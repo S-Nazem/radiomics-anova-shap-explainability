@@ -564,7 +564,7 @@ def fit_and_evaluate_model(X_train, y_train, X_test, y_test, model, label="Model
     auc = roc_auc_score(y_test, y_proba)
     report = classification_report(y_test, y_pred, digits=3, output_dict=True)
 
-    print(f"📊 {label} AUC:", auc)
+    print(f" {label} AUC:", auc)
     print(classification_report(y_test, y_pred, digits=3))
 
     return report
