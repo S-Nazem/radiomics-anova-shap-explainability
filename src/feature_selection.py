@@ -37,7 +37,7 @@ def kruskal_fdr_corr_filter(df, target_col="Model", subject_col="PatientName", a
     selected = kw_df[kw_df["Keep"]].index.tolist()
 
     if verbose:
-        print(f"✅ {len(selected)} features selected after BH correction (FDR < {alpha})")
+        print(f" {len(selected)} features selected after BH correction (FDR < {alpha})")
 
     # Correlation filtering
     df_selected = df[[subject_col, target_col] + selected].copy()
@@ -51,9 +51,9 @@ def kruskal_fdr_corr_filter(df, target_col="Model", subject_col="PatientName", a
             if f1 in dropped or f2 in dropped:
                 continue
             try:
-                # 👉 suppress warnings only for this call
+                #  suppress warnings only for this call
                 with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")        # hide ALL warnings inside the block
+                    warnings.simplefilter("ignore")       
                     r = pg.rm_corr(
                         data=df_selected,
                         x=f1,
@@ -77,6 +77,6 @@ def kruskal_fdr_corr_filter(df, target_col="Model", subject_col="PatientName", a
     final_features = list(selected_set - dropped)
 
     if verbose:
-        print(f"✅ {len(final_features)} features retained after correlation filtering")
+        print(f" {len(final_features)} features retained after correlation filtering")
 
     return final_features, kw_df

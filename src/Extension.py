@@ -188,7 +188,7 @@ def parse_xml_rois(xml_path, ns, patient_id):
     try:
         root = ET.parse(xml_path).getroot()
     except Exception as e:
-        print(f"❌ Failed parsing XML for {patient_id}: {e}")
+        print(f" Failed parsing XML for {patient_id}: {e}")
         return roi_data, False
 
     for reading_session in root.findall(".//lidc:readingSession", ns):
@@ -287,12 +287,12 @@ def build_3d_volumes_from_rois(df_good_clean, dicom_root, output_path="volume_re
             })
 
         except Exception as e:
-            print(f"❌ Error for {patient_id}, tumour {tumour_id}: {e}")
+            print(f" Error for {patient_id}, tumour {tumour_id}: {e}")
 
     with open(output_path, "wb") as f:
         pickle.dump(volume_results, f)
 
-    print(f"✅ Saved {len(volume_results)} tumour volumes to {output_path}")
+    print(f" Saved {len(volume_results)} tumour volumes to {output_path}")
 
 
 
@@ -333,7 +333,7 @@ def extract_radiomic_features(volume_results, extractor=None, yaml_path=None):
             features_list.append(features_clean)
 
         except Exception as e:
-            print(f"❌ Error for Patient {patient_id}, Tumour {tumour_id}: {e}")
+            print(f" Error for Patient {patient_id}, Tumour {tumour_id}: {e}")
 
     return pd.DataFrame(features_list)
 
@@ -355,7 +355,7 @@ def merge_radiomics_with_labels(df_radiomics, df_good_clean):
     # Step 2: Check for conflicting labels
     conflicts = df_labels.groupby(["PatientID", "TumourID"])["Label"].nunique()
     if (conflicts > 1).any():
-        print("❌ Warning: Multiple labels found for some (PatientID, TumourID) combinations.")
+        print(" Warning: Multiple labels found for some (PatientID, TumourID) combinations.")
 
     # Step 3: Remove true duplicates
     df_labels = df_labels.drop_duplicates(subset=["PatientID", "TumourID"])
@@ -388,7 +388,7 @@ def select_features_kw_fdr(df, alpha=0.25):
     selected = X.columns[fdr_pass]
     X_selected = X[selected]
 
-    print(f"✅ Selected {len(selected)} features out of {X.shape[1]} after FDR correction.")
+    print(f" Selected {len(selected)} features out of {X.shape[1]} after FDR correction.")
     return X_selected, selected, pvals_corrected
 
 
@@ -420,7 +420,7 @@ def remove_correlated_features(df, selected_features, pvals_corrected, subject_c
                 print(f"⚠️ Correlation failed for {key1} & {key2}: {e}")
 
     final_features = list(set(selected_features) - dropped)
-    print(f"✅ {len(final_features)} features selected after rm_corr filtering")
+    print(f" {len(final_features)} features selected after rm_corr filtering")
     return final_features
 
 
@@ -444,8 +444,8 @@ def run_rfecv(X, y, output_path=None):
     rfecv.fit(X, y)
     selected_features = X.columns[rfecv.support_].tolist()
 
-    print("✅ Optimal number of features:", rfecv.n_features_)
-    print("✅ Selected features:", selected_features)
+    print(" Optimal number of features:", rfecv.n_features_)
+    print(" Selected features:", selected_features)
 
     if output_path:
         plt.figure(figsize=(10, 5))
@@ -487,7 +487,7 @@ def run_boruta(X, y, alpha=0.05, verbose=2, max_iter=100):
 
     selected = X.columns[selector.support_].tolist()
 
-    print("✅ Selected features using Boruta:", selected)
+    print(" Selected features using Boruta:", selected)
     return selected
 
 
@@ -524,7 +524,7 @@ def evaluate_pipeline(X_train, y_train, X_test, y_test, classifier=None, report_
     clf_report = classification_report(y_test, y_pred, digits=3)
     clf_dict = classification_report(y_test, y_pred, output_dict=True)
 
-    print(f"📊 {report_name or 'Model'} AUC:", auc_score)
+    print(f" {report_name or 'Model'} AUC:", auc_score)
     print(clf_report)
 
     return clf_dict
