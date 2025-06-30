@@ -29,3 +29,5 @@ data/csv_backups
 
 data/ModelsUncorrected
 
+*.code-workspace
+
