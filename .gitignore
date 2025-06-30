@@ -9,8 +9,6 @@ Reading List/
 
 venv/
 
-data/
-
 *.pptx
 
 .DS_Store
@@ -18,3 +16,16 @@ data/
 __pycache__/
 
 *.ipynb_checkpoints/
+
+data/LIDC_Extension/DICOM_DATA_120_PATIENTS
+
+data/LIDC_Extension/LIDC-XML-only
+
+data/LIDC_Extension/volume_results.pkl
+
+data/LIDC_Extension/tcia-diagnosis-data-2012-04-20.xls
+
+data/csv_backups
+
+data/ModelsUncorrected
+
