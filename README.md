@@ -85,6 +85,8 @@ sn665/
 │
 ├── Instructions.md               
 ├── requirements.txt              # Python environment dependencies
+├── Executive_Summary.pdf         # Executive Summary of full paper (<1000 words)
+├── Final_Report.pdf              # Full MPhil data analysis report paper (<7000 words)
 ├── README.md                     # This file
 └── .gitignore                    # Files and folders to ignore in Git
 
