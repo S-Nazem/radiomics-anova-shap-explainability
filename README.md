@@ -52,23 +52,23 @@ SHAP analysis repeated over 1000 independent seeds unanimously showed GLSZM Gray
 sn665/
 │
 ├── data/                         # Radiomic CSVs and metadata
-│   ├── LIDC_Extension/csv           # Includes DICOM + XMLs from LIDC-IDRI plus csvs
-│   ├── Photoacoustic_Study/csv      # PAI radiomics and metadata csvs
+│   ├── LIDC_Extension/csv           # Includes csvs for EXTENSION.ipynb
+│   ├── Photoacoustic_Study/csv      # includes csvs for ANOVA and MODEL_PERFORMANCE.ipynb
 │
 ├── Finalised Notebooks/          # Final cleaned Jupyter notebooks
 │   ├── ANOVA.ipynb               # Section A: ANOVA Sensitivity analysis
 │   ├── MODEL_PERFORMANCE.ipynb   # Section A: Model Discrimination (ML + SHAP)
 │   ├── EXTENSION.ipynb           # Section B: LIDC-IDRI Extension
 │
-├── Development Notebooks/        # Early exploratory notebooks (included for reference)
+├── Development Notebooks/        # Early exploratory notebooks (included for context)
 │
-├── MATLAB scripts (ANOVA)/       # MATLAB scripts used for full factorial ANOVA
+├── MATLAB scripts (ANOVA)/       # MATLAB scripts used for ANOVA csv creation -> plots
 │
 ├── src/                          # Custom Python modules (importable functions)
-│   ├── Extension.py              # Add code used for the LIDC-IRDI extension
-│   ├── feature_selection.py      # Feature selection utilities
+│   ├── Extension.py              # Code used for the LIDC-IRDI extension
+│   ├── feature_selection.py      # Feature selection function
 │   ├── ML.py                     # ML training
-│   ├── PAI.py                    # SHAP, ML, and ANOVA utils for Section A (PAI)
+│   ├── PAI.py                    # SHAP, ML, and ANOVA utils for Section A 
 │   └── plotting.py               # Plotting functions for section A
 │
 ├── plots/                        # Figures from Section A (PAI)
@@ -83,7 +83,7 @@ sn665/
 │   ├── shap_plots/
 │   └── misc/
 │
-├── Instructions.md               # Internal usage instructions
+├── Instructions.md               
 ├── requirements.txt              # Python environment dependencies
 ├── README.md                     # This file
 └── .gitignore                    # Files and folders to ignore in Git
