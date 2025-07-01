@@ -1,8 +1,8 @@
 # Radiomic Feature Sensitivity and Classification in Photoacoustic Imaging and CT (MPhil Project)
 
-This repository contains the complete code, data pipeline, and analysis for my MPhil project on radiomic feature robustness and classification across two imaging modalities:
+This repository contains the complete code, data pipeline, analysis notebooks, and final report for my MPhil project on Machine Learning and Feature Selection of Imaging-Based Biomarkers for Tumour Classification. The project was split across the two imaging modalities:
 
-- **Section A:** Reproduction of Escudero Sánchez et al. using full factorial ANOVA, feature selection, machine learning, and SHAP interpretability on photoacoustic imaging of breast cancer PDXs.
+- **Section A:** Reproduction of Escudero Sánchez et al. using full factorial + marginal ANOVA, feature selection, machine learning, and SHAP interpretability on photoacoustic imaging of breast cancer PDXs.
 - **Section B:** Extension study applying the same radiomics pipeline to the LIDC-IDRI CT dataset for lung nodule classification.
 
 ---
@@ -16,32 +16,32 @@ This repository contains the complete code, data pipeline, and analysis for my M
 
 Full-factorial ANOVA revealed key radiomic features sensitive to the model type and not to confounding factors (ie: FO Skewness, FO Kurtosis).
 
-<p align="center"> <img src="plots/ANOVA_plots/ANOVA_full.png" width="600"/> </p>
+<p align="center"> <img src="plots/ANOVA_plots/ANOVA_full.png" width="700"/> </p>
 
 2. SHAP Analysis
 
-SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), FO Skewness, FO Variance, and GLCM Imc2 as the most impactful features for the RF classifier
+SHAP values identified FO 10th percentile, FO 90th Percentile (RMS), FO Skewness, FO Variance, and GLCM Imc2 as the most impactful features for the RF classifier.
 
-<p align="center"> <img src="plots/SHAP_plots/shap_beeswarm.png" width="600"/> </p>
+<p align="center"> <img src="plots/SHAP_plots/shap_beeswarm.png" width="700"/> </p>
 
 
 **Section B:** LIDC-IRDI Extension Study
 
-1. Classifier Performance Plot (RFE vs Boruta) for both original and resampled sets
+1. Classifier Performance Plot (RFE vs Boruta) for both original and resampled sets.
 
-<p align="center"> <img src="plots_extension/ML_plots/combined_rfe_boruta_smote_shaded.png" width="600"/> </p>
+<p align="center"> <img src="plots_extension/ML_plots/combined_rfe_boruta_smote_shaded.png" width="700"/> </p>
 
 2. SHAP Analysis
 
-SHAP analysis identified GLSZM Gray Level Non uniformity and its normalised counterpart as the most impactful features. Very little overlap between the PAI study and this, as could be expected.
+SHAP analysis identified GLSZM Gray Level Non uniformity and its normalised counterpart as the most impactful features. Very little overlap between the PAI study and this, as could be expected from completely different imaging modalities and tumour biology.
 
-<p align="center"> <img src="plots_extension/shap_plots/shap_bar_full.png" width="600"/> </p>
+<p align="center"> <img src="plots_extension/shap_plots/shap_bar_full.png" width="700"/> </p>
 
 3. SHAP Consistency Box plots
 
-SHAP analysis repeated over 1000 independant seeds unanimously showed GLSZM Gray Level Non Unifomity as the most influential feature.
+SHAP analysis repeated over 1000 independent seeds unanimously showed GLSZM Gray Level Non Unifomity as the most influential feature.
 
-<p align="center"> <img src="plots_extension/shap_plots/shap_rank_stability_horizontal_nosmote.png" width="600"/> </p>
+<p align="center"> <img src="plots_extension/shap_plots/shap_rank_stability_horizontal_nosmote.png" width="700"/> </p>
 
 
 --
@@ -142,6 +142,6 @@ Section B — LIDC Extension (CT dataset)
 
 ## Use of Generative Tools 
 
-- I used Github's Copilot to help me automatically finish off some code blocks and also to quickly docstring my functions.
+- I used Github's Copilot to help me automatically finish off code blocks and also to quickly docstring my functions in src/.
 
-- I used LLMs (ChatGPT) to help me create professional looking plots and occasionally to help me debug errors when i implemented something incorrectly.
+- I used LLMs (eg. ChatGPT) to help me create professional looking plots and occasionally to help me debug errors when i implemented something incorrectly, (eg. in Dev_notebooks).
