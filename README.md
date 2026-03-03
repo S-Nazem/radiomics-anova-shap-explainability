@@ -7,6 +7,11 @@ This repository contains the complete code, data pipeline, analysis notebooks, a
 
 ---
 
+# 📄 Read the Full Report
+
+**[Click here to view the PDF](Final_Report.pdf)**
+
+---
 
 ## Key Results
 
